@@ -1,18 +1,12 @@
-package com.epam.training.student_ihor_tetiushev.fundamental.optional_task1;
-
+import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.edge.EdgeDriver;
-import org.openqa.selenium.support.ui.Select;
 
-import java.lang.reflect.Array;
-
-public class HelloWeb {
-    public static void main(String[] args) throws InterruptedException {
-        //WebDriver driver = new ChromeDriver();
+public class HelloWebTest {
+    @Test
+    void helloPastebinCom_newPaste() throws InterruptedException {
         WebDriver driver = new EdgeDriver();
         driver.get("https://pastebin.com/");
         //Thread.sleep(2000);
@@ -34,9 +28,7 @@ public class HelloWeb {
 
         WebElement inputTitle = driver.findElement(By.id("postform-name"));
         inputTitle.sendKeys("helloweb");
-        Thread.sleep(10000);
+        Thread.sleep(2000);
         driver.quit();
-
-
     }
 }
