@@ -34,7 +34,7 @@ public class HelloWeb {
 
         WebElement inputTitle = driver.findElement(By.id("postform-name"));
         inputTitle.sendKeys("helloweb");
-        Thread.sleep(10000);
+        Thread.sleep(5000);
         driver.quit();
 
 
