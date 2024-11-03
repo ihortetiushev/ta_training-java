@@ -23,6 +23,17 @@ public abstract class TestBase {
         this.driver = driver;
     }
 
+    private void clearControlText(String text, WebElement element) {
+        Actions actions = new Actions(driver);
+        for (int i = 0; i < text.length(); i++) {
+            actions.click(element)
+                    .sendKeys(Keys.BACK_SPACE)
+                    .build()
+                    .perform();
+        }
+    }
+
+
     private void clearInputWithActions(WebElement target) {
         var actions = new Actions(driver);
         actions.doubleClick(target)
@@ -32,7 +43,7 @@ public abstract class TestBase {
     }
 
     @Test
-    protected void useCase1() throws InterruptedException {
+    protected void useCase1(){
         driver.get("https://www.saucedemo.com/");
 
         WebElement loginPaste = driver.findElement(By.xpath("//*[@id=\"user-name\"]"));
@@ -56,5 +67,26 @@ public abstract class TestBase {
     }
 
 
+    @Test
+    protected void useCase2(){
+        driver.get("https://www.saucedemo.com/");
 
+        WebElement loginPaste = driver.findElement(By.xpath("//*[@id=\"user-name\"]"));
+        loginPaste.sendKeys("User001");
+
+        WebElement passwordPaste = driver.findElement(By.xpath("//*[@id=\"password\"]"));
+        String strPasswordPaste = "admin";
+        passwordPaste.sendKeys(strPasswordPaste);
+
+        clearControlText(strPasswordPaste, passwordPaste);
+
+
+        WebElement loginBtn = driver.findElement(By.xpath("//*[@id=\"login-button\"]"));
+        loginBtn.click();
+
+        new WebDriverWait(driver, Duration.ofSeconds(2)).until(ExpectedConditions
+                .presenceOfElementLocated(By.xpath("//*[@id=\"login_button_container\"]" +
+                        "/div/form/div[3]/h3[contains(text(), 'Password is required')]")));
+        driver.quit();
+    }
 }
