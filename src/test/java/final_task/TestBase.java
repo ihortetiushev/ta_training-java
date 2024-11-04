@@ -11,6 +11,8 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
@@ -59,16 +61,22 @@ public abstract class TestBase {
         WebElement loginBtn = driver.findElement(By.xpath("//*[@id=\"login-button\"]"));
         loginBtn.click();
 
-        new WebDriverWait(driver, Duration.ofSeconds(2)).until(ExpectedConditions
-                .presenceOfElementLocated(By.xpath("//*[@id='login_button_container']" +
-                        "/div/form/div[3]/h3[contains(text(), 'Username is required')]")
-                ));
+        new WebDriverWait(driver, Duration.ofSeconds(2)).until(
+                ExpectedConditions.presenceOfElementLocated(By.xpath(
+                        "//*[@id='login_button_container']/div/form/div[3]/h3")));
+
+        WebElement errorMessage = driver.findElement(By.xpath("//*[@id='login_button_container']/div/form/div[3]/h3"));
+        String errorText = errorMessage.getText();
+
+        assertThat("Expected error message not displayed or username has already been entered!",
+                errorText, containsString("Username is required"));
+
         driver.quit();
     }
 
 
     @Test
-    protected void useCase2(){
+    protected void useCase2() {
         driver.get("https://www.saucedemo.com/");
 
         WebElement loginPaste = driver.findElement(By.xpath("//*[@id=\"user-name\"]"));
@@ -80,13 +88,21 @@ public abstract class TestBase {
 
         clearControlText(strPasswordPaste, passwordPaste);
 
-
         WebElement loginBtn = driver.findElement(By.xpath("//*[@id=\"login-button\"]"));
         loginBtn.click();
 
-        new WebDriverWait(driver, Duration.ofSeconds(2)).until(ExpectedConditions
-                .presenceOfElementLocated(By.xpath("//*[@id=\"login_button_container\"]" +
-                        "/div/form/div[3]/h3[contains(text(), 'Password is required')]")));
+
+        new WebDriverWait(driver, Duration.ofSeconds(2)).until(
+                ExpectedConditions.presenceOfElementLocated(By.xpath(
+                        "//*[@id='login_button_container']/div/form/div[3]/h3")));
+
+        WebElement errorMessage = driver.findElement(By.xpath("//*[@id='login_button_container']/div/form/div[3]/h3"));
+        String errorText = errorMessage.getText();
+
+        assertThat("Expected error message not displayed or password has already been entered!",
+                errorText, containsString("Password is required"));
+
         driver.quit();
     }
+
 }
