@@ -1,16 +1,11 @@
 package com.epam.training.student_ihor_tetiushev.fundamental.optional_task1;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.edge.EdgeDriver;
-import org.openqa.selenium.support.ui.Select;
 
-import java.lang.reflect.Array;
-
-public class HelloWeb {
+public class Task1WebDriver {
     public static void main(String[] args) throws InterruptedException {
         //WebDriver driver = new ChromeDriver();
         WebDriver driver = new EdgeDriver();
@@ -36,7 +31,5 @@ public class HelloWeb {
         inputTitle.sendKeys("helloweb");
         Thread.sleep(5000);
         driver.quit();
-
-
     }
 }
