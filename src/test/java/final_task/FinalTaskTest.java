@@ -23,15 +23,17 @@ import java.util.stream.Stream;
 public class FinalTaskTest {
     Logger log = Logger.getLogger(this.getClass().getName());
 
+    //provided headless mode when needed
+    private static boolean headlessMode = false;
 
     static Stream<WebDriver> getWebDriverParams() {
-        //provided headless mode
-        /*ChromeOptions option1 = new ChromeOptions();
-        option1.addArguments("headless");
-        EdgeOptions option2= new EdgeOptions();
-        option2.addArguments("headless");
-        return Stream.of(new ChromeDriver(option1), new EdgeDriver(option2));*/
-        return Stream.of(new ChromeDriver(), new EdgeDriver());
+        ChromeOptions chromeOptions = new ChromeOptions();
+        EdgeOptions edgeOptions = new EdgeOptions();
+        if (headlessMode) {
+            chromeOptions.addArguments("headless");
+            edgeOptions.addArguments("headless");
+        }
+        return Stream.of(new ChromeDriver(chromeOptions), new EdgeDriver(edgeOptions));
     }
 
     private void clearControlText(String text, WebElement element, WebDriver driver) {
@@ -46,7 +48,7 @@ public class FinalTaskTest {
     }
 
     private void clearInputWithActions(WebElement target, WebDriver driver) {
-        log.log(Level.INFO, "clearInputWithActions " + "target: "+ target);
+        log.log(Level.INFO, "clearInputWithActions " + "target: " + target);
         var actions = new Actions(driver);
         actions.doubleClick(target)
                 .sendKeys(Keys.BACK_SPACE)

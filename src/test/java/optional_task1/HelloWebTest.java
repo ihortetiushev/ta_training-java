@@ -6,6 +6,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.edge.EdgeDriver;
+
 @Disabled
 
 public class HelloWebTest {
@@ -13,16 +14,13 @@ public class HelloWebTest {
     void helloPastebinCom_newPaste() throws InterruptedException {
         WebDriver driver = new EdgeDriver();
         driver.get("https://pastebin.com/");
-        //Thread.sleep(2000);
         WebElement pasteBtn = driver.findElement(By.className("header__btn"));
         pasteBtn.click();
-        //pasteBtn.sendKeys(Keys.ESCAPE);
 
         WebElement textArea = driver.findElement(By.id("postform-text"));
         textArea.click();
 
         textArea.sendKeys("Hello from WebDriver");
-        //textArea.sendKeys(Keys.ESCAPE);
 
         WebElement expirationSelector = driver.findElement(By.id("select2-postform-expiration-container"));
         expirationSelector.click();
