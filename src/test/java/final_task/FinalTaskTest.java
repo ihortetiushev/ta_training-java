@@ -24,7 +24,7 @@ public class FinalTaskTest {
     Logger log = Logger.getLogger(this.getClass().getName());
 
     //provided headless mode when needed
-    private static boolean headlessMode = false;
+    static boolean headlessMode = true;
 
     static Stream<WebDriver> getWebDriverParams() {
         ChromeOptions chromeOptions = new ChromeOptions();
