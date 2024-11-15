@@ -1,11 +1,12 @@
 package final_task;
 
+import io.cucumber.java.AfterAll;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.junit.jupiter.api.Assertions;
 import org.openqa.selenium.*;
-import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -14,19 +15,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class StepDefinitions {
-    WebDriver driver = new EdgeDriver();
+    static WebDriver driver = new ChromeDriver();
     private static final Logger log = Logger.getLogger(StepDefinitions.class.getName());
-
-    private void clearControlText(String text, WebElement element, WebDriver driver) {
-        log.log(Level.INFO, "clearControlText " + "element: " + element + "element length: " + text.length());
-        Actions actions = new Actions(driver);
-        for (int i = 0; i < text.length(); i++) {
-            actions.click(element)
-                    .sendKeys(Keys.BACK_SPACE)
-                    .build()
-                    .perform();
-        }
-    }
 
     private void clearInputWithActions(WebElement target, WebDriver driver) {
         log.log(Level.INFO, "clearInputWithActions " + "target: " + target);
@@ -36,6 +26,7 @@ public class StepDefinitions {
                 .build()
                 .perform();
     }
+    //For UC-1
     @Given("I am on the SauceDemo login page")
     public void openLoginPage() {
         log.log(Level.INFO, "Opening SauceDemo login page");
@@ -80,7 +71,34 @@ public class StepDefinitions {
         log.log(Level.INFO, "Error message: " + actualMessage);
         Assertions.assertTrue(actualMessage.contains(expectedMessage),
                 "Expected error message not displayed!");
-        driver.close();
+    }
+
+    //For UC-2
+    @When("I clear the password field")
+    public void clearPaaswordInputField() throws InterruptedException {
+        log.log(Level.INFO, "Clearing password input field");
+        WebElement passwordPaste = driver.findElement(By.xpath("//*[@id='password']"));
+        log.log(Level.INFO, "Clearing the inputs");
+        clearInputWithActions(passwordPaste, driver);
+    }
+
+    //For UC-3
+    @Then("I should see validation the title {string} in the dashboard")
+    public void checkTitle(String expectedTitle) {
+        log.log(Level.INFO, "Checking the expected title");
+
+        WebElement title = driver.findElement(By.xpath("//*[@id=\"header_container\"]/div[1]/div[2]/div"));
+        String actualTitle = title.getText();
+
+        log.log(Level.INFO, "Title: " + actualTitle);
+
+
+        Assertions.assertTrue(actualTitle.contains(expectedTitle),
+                "The title is different or it is not displayed!");
+    }
+
+    @AfterAll
+    public static void closingWebBrowsers() {
         driver.quit();
     }
 }

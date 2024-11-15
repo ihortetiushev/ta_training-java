@@ -1,11 +1,9 @@
 package final_task;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
@@ -16,6 +14,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -24,7 +24,8 @@ public class FinalTaskTest {
     Logger log = Logger.getLogger(this.getClass().getName());
 
     //provided headless mode when needed
-    static boolean headlessMode = true;
+    static boolean headlessMode = false;
+    static List<WebDriver> drivers = new ArrayList<>();
 
     static Stream<WebDriver> getWebDriverParams() {
         ChromeOptions chromeOptions = new ChromeOptions();
@@ -56,12 +57,19 @@ public class FinalTaskTest {
                 .perform();
     }
 
+    private static void addDriverIfAbsent(WebDriver driver) {
+        if (!drivers.contains(driver)) {
+            drivers.add(driver);
+        }
+    }
+
+
     @ParameterizedTest
     @MethodSource("getWebDriverParams")
     protected void useCase1(WebDriver driver) {
+        addDriverIfAbsent(driver);
         log.log(Level.INFO, "Executing useCase1");
         driver.get("https://www.saucedemo.com/");
-
 
         log.log(Level.INFO, "Enter credentials (login and password)");
         WebElement loginPaste = driver.findElement(By.xpath("//*[@id=\"user-name\"]"));
@@ -87,13 +95,12 @@ public class FinalTaskTest {
         log.log(Level.INFO, "Checking the error message " + "error message: " + errorText);
         assertThat("Expected error message not displayed or username has already been entered!",
                 errorText, containsString("Username is required"));
-
-        driver.quit();
     }
 
     @ParameterizedTest
     @MethodSource("getWebDriverParams")
     protected void useCase2(WebDriver driver) {
+        addDriverIfAbsent(driver);
         log.log(Level.INFO, "Executing useCase 2");
         driver.get("https://www.saucedemo.com/");
 
@@ -123,13 +130,12 @@ public class FinalTaskTest {
 
         assertThat("Expected error message not displayed or password has already been entered!",
                 errorText, containsString("Password is required"));
-
-        driver.quit();
     }
 
     @ParameterizedTest
     @MethodSource("getWebDriverParams")
     protected void useCase3(WebDriver driver) {
+        addDriverIfAbsent(driver);
         log.log(Level.INFO, "Executing useCase 3");
         driver.get("https://www.saucedemo.com/");
 
@@ -154,7 +160,11 @@ public class FinalTaskTest {
         log.log(Level.INFO, "Checking the title into the header container " + "title text: " + titleText);
         assertThat("Title is not displayed or the title is not as expected!",
                 titleText, containsString("Swag Labs"));
-
-        driver.quit();
+    }
+    @ParameterizedTest
+    @MethodSource("getWebDriverParams")
+    @AfterAll
+    public static void afterAll() {
+        drivers.forEach(WebDriver::quit);
     }
 }
