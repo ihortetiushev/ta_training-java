@@ -1,6 +1,5 @@
 package final_task;
 
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.openqa.selenium.*;
@@ -21,20 +20,31 @@ import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 public class FinalTaskTest {
-    Logger log = Logger.getLogger(this.getClass().getName());
-
-    //provided headless mode when needed
-    static boolean headlessMode = false;
-    static List<WebDriver> drivers = new ArrayList<>();
+    protected static final String TESTED_URL = PropertyReader.getProperties("testedUrl", null);
+    protected static final String LOGIN_PASTE_XPATH = PropertyReader.getProperties("loginPasteXPath", null);
+    protected static final String PASSWORD_PASTE_XPATH = PropertyReader.getProperties("passwordPasteXPath", null);
+    protected static final String LOGIN_BUTTON_XPATH = PropertyReader.getProperties("loginButtonXPath", null);
+    protected static final String TITLE_XPATH = PropertyReader.getProperties("titleXPath", null);
+    private static final Logger log = Logger.getLogger(FinalTaskTest.class.getName());
+    private static final boolean HEADLESS_MODE = Boolean.parseBoolean(PropertyReader.getProperties("headlessMode", "false"));
+    static final private List<WebDriver> DRIVERS = new ArrayList<>();
 
     static Stream<WebDriver> getWebDriverParams() {
         ChromeOptions chromeOptions = new ChromeOptions();
         EdgeOptions edgeOptions = new EdgeOptions();
-        if (headlessMode) {
+        if (HEADLESS_MODE) {
             chromeOptions.addArguments("headless");
             edgeOptions.addArguments("headless");
         }
         return Stream.of(new ChromeDriver(chromeOptions), new EdgeDriver(edgeOptions));
+    }
+
+    private static void addDriverIfAbsent(WebDriver driver) {
+        if (!DRIVERS.contains(driver)) {
+            DRIVERS.add(driver);
+            driver.manage().window().maximize();
+
+        }
     }
 
     private void clearControlText(String text, WebElement element, WebDriver driver) {
@@ -57,44 +67,41 @@ public class FinalTaskTest {
                 .perform();
     }
 
-    private static void addDriverIfAbsent(WebDriver driver) {
-        if (!drivers.contains(driver)) {
-            drivers.add(driver);
-        }
-    }
-
-
     @ParameterizedTest
     @MethodSource("getWebDriverParams")
     protected void useCase1(WebDriver driver) {
+
         addDriverIfAbsent(driver);
         log.log(Level.INFO, "Executing useCase1");
-        driver.get("https://www.saucedemo.com/");
+        driver.get(TESTED_URL);
 
         log.log(Level.INFO, "Enter credentials (login and password)");
-        WebElement loginPaste = driver.findElement(By.xpath("//*[@id=\"user-name\"]"));
+        WebElement loginPaste = driver.findElement(By.xpath(LOGIN_PASTE_XPATH));
         loginPaste.sendKeys("User123");
 
-        WebElement passwordPaste = driver.findElement(By.xpath("//*[@id=\"password\"]"));
+        WebElement passwordPaste = driver.findElement(By.xpath(PASSWORD_PASTE_XPATH));
         passwordPaste.sendKeys("passwordUser123");
 
         log.log(Level.INFO, "Clearing the inputs");
         clearInputWithActions(loginPaste, driver);
         clearInputWithActions(passwordPaste, driver);
 
-        WebElement loginBtn = driver.findElement(By.xpath("//*[@id=\"login-button\"]"));
+        WebElement loginBtn = driver.findElement(By.xpath(LOGIN_BUTTON_XPATH));
         loginBtn.click();
 
         log.log(Level.INFO, "Checking the error window");
         new WebDriverWait(driver, Duration.ofSeconds(2)).until(
                 ExpectedConditions.presenceOfElementLocated(By.xpath(
-                        "//*[@id='login_button_container']/div/form/div[3]/h3")));
+                        "//div[@class='error-message-container error']" +
+                                "//h3[text()='Epic sadface: Username is required']")));
 
-        WebElement errorMessage = driver.findElement(By.xpath("//*[@id='login_button_container']/div/form/div[3]/h3"));
+        WebElement errorMessage = driver.findElement(By.xpath("//div[@class='error-message-container error']" +
+                "//h3[text()='Epic sadface: Username is required']"));
         String errorText = errorMessage.getText();
         log.log(Level.INFO, "Checking the error message " + "error message: " + errorText);
         assertThat("Expected error message not displayed or username has already been entered!",
-                errorText, containsString("Username is required"));
+                errorText, equalTo("Epic sadface: Username is required"));
+        driver.quit();
     }
 
     @ParameterizedTest
@@ -102,34 +109,37 @@ public class FinalTaskTest {
     protected void useCase2(WebDriver driver) {
         addDriverIfAbsent(driver);
         log.log(Level.INFO, "Executing useCase 2");
-        driver.get("https://www.saucedemo.com/");
+        driver.get(TESTED_URL);
 
         log.log(Level.INFO, "Enter credentials (login and password)");
-        WebElement loginPaste = driver.findElement(By.xpath("//*[@id=\"user-name\"]"));
+        WebElement loginPaste = driver.findElement(By.xpath(LOGIN_PASTE_XPATH));
         loginPaste.sendKeys("User001");
 
-        WebElement passwordPaste = driver.findElement(By.xpath("//*[@id=\"password\"]"));
+        WebElement passwordPaste = driver.findElement(By.xpath(PASSWORD_PASTE_XPATH));
         String strPasswordPaste = "admin";
         passwordPaste.sendKeys(strPasswordPaste);
 
         log.log(Level.INFO, "Clearing the inputs");
         clearControlText(strPasswordPaste, passwordPaste, driver);
 
-        WebElement loginBtn = driver.findElement(By.xpath("//*[@id=\"login-button\"]"));
+        WebElement loginBtn = driver.findElement(By.xpath(LOGIN_BUTTON_XPATH));
         loginBtn.click();
 
         log.log(Level.INFO, "Checking the error window");
         new WebDriverWait(driver, Duration.ofSeconds(2)).until(
                 ExpectedConditions.presenceOfElementLocated(By.xpath(
-                        "//*[@id='login_button_container']/div/form/div[3]/h3")));
+                        "//div[@class='error-message-container error']" +
+                                "//h3[text()='Epic sadface: Password is required']")));
 
-        WebElement errorMessage = driver.findElement(By.xpath("//*[@id='login_button_container']/div/form/div[3]/h3"));
+        WebElement errorMessage = driver.findElement(By.xpath("//div[@class='error-message-container error']" +
+                "//h3[text()='Epic sadface: Password is required']"));
         String errorText = errorMessage.getText();
 
         log.log(Level.INFO, "Checking the error message " + "error message: " + errorText);
 
         assertThat("Expected error message not displayed or password has already been entered!",
-                errorText, containsString("Password is required"));
+                errorText, equalTo("Epic sadface: Password is required"));
+        driver.quit();
     }
 
     @ParameterizedTest
@@ -137,34 +147,33 @@ public class FinalTaskTest {
     protected void useCase3(WebDriver driver) {
         addDriverIfAbsent(driver);
         log.log(Level.INFO, "Executing useCase 3");
-        driver.get("https://www.saucedemo.com/");
+        driver.get(TESTED_URL);
 
         log.log(Level.INFO, "Enter credentials (login and password)");
-        WebElement loginPaste = driver.findElement(By.xpath("//*[@id=\"user-name\"]"));
+        WebElement loginPaste = driver.findElement(By.xpath(LOGIN_PASTE_XPATH));
         loginPaste.sendKeys("standard_user");
 
-        WebElement passwordPaste = driver.findElement(By.xpath("//*[@id=\"password\"]"));
+        WebElement passwordPaste = driver.findElement(By.xpath(PASSWORD_PASTE_XPATH));
         passwordPaste.sendKeys("secret_sauce");
 
-        WebElement loginBtn = driver.findElement(By.xpath("//*[@id=\"login-button\"]"));
+        WebElement loginBtn = driver.findElement(By.xpath(LOGIN_BUTTON_XPATH));
         loginBtn.click();
 
         log.log(Level.INFO, "Checking the header container");
         new WebDriverWait(driver, Duration.ofSeconds(2)).until(
-                ExpectedConditions.presenceOfElementLocated(By.xpath(
-                        "//*[@id=\"header_container\"]/div[1]/div[2]/div")));
-
-        WebElement title = driver.findElement(By.xpath("//*[@id=\"header_container\"]/div[1]/div[2]/div"));
+                ExpectedConditions.presenceOfElementLocated(By.xpath(TITLE_XPATH)));
+        WebElement title = driver.findElement(By.xpath(TITLE_XPATH));
         String titleText = title.getText();
 
         log.log(Level.INFO, "Checking the title into the header container " + "title text: " + titleText);
         assertThat("Title is not displayed or the title is not as expected!",
-                titleText, containsString("Swag Labs"));
+                titleText, equalTo("Swag Labs"));
+        driver.quit();
     }
-    @ParameterizedTest
+    /*@ParameterizedTest
     @MethodSource("getWebDriverParams")
     @AfterAll
     public static void afterAll() {
         drivers.forEach(WebDriver::quit);
-    }
+    }*/
 }
